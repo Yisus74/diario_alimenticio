@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 flex items-center">
+                        <i class="fas fa-chart-line text-green-primary mr-3"></i>
+                        Estadísticas y Análisis
+                    </h1>
+                    <p class="text-gray-600 mt-1">Visualiza tu progreso y patrones en la alimentación consciente</p>
+                </div>
+                <a href="{{ url_for('generar_reporte_mensual') }}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-primary hover:bg-green-secondary transition duration-150">
+                    <i class="fas fa-file-pdf mr-2"></i>
+                    Reporte PDF
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas Generales -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-green-light rounded-lg flex items-center justify-center">
+                        <i class="fas fa-book text-green-primary text-xl"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total de Registros</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ stats.total_registros }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-battery-half text-orange-accent text-xl"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Hambre Promedio</p>
+                    <p class="text-2xl font-bold text-gray-900">
+                        {% if stats.promedio_hambre > 0 %}
+                            {{ "%.1f"|format(stats.promedio_hambre) }}/10
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-battery-full text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Saciedad Promedio</p>
+                    <p class="text-2xl font-bold text-gray-900">
+                        {% if stats.promedio_saciedad > 0 %}
+                            {{ "%.1f"|format(stats.promedio_saciedad) }}/10
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-fire text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Racha Máxima</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ stats.dias_consecutivos }} días</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if registros %}
+    <!-- Gráficos y Tendencias -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Niveles de Hambre y Saciedad -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Tendencia de Hambre y Saciedad</h2>
+                <p class="text-sm text-gray-600">Últimos 10 registros</p>
+            </div>
+            <div class="p-6">
+                <canvas id="hambreSaciedadChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Comidas con Atención -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Alimentación Consciente</h2>
+                <p class="text-sm text-gray-600">Porcentaje de comidas con atención plena</p>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center justify-center">
+                    <div class="relative w-32 h-32">
+                        <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-gray-300" stroke="currentColor" stroke-width="3" fill="none"
+                                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            <path class="text-green-primary" stroke="currentColor" stroke-width="3" fill="none"
+                                  stroke-dasharray="{{ stats.porcentaje_atencion|round }}, 100"
+                                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="text-2xl font-bold text-gray-900">{{ stats.porcentaje_atencion|round|int }}%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-sm text-gray-600">
+                        {{ stats.registros_con_atencion }} de {{ stats.total_registros }} comidas con atención plena
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Análisis de Emociones -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Análisis de Emociones Antes de Comer</h2>
+            <p class="text-sm text-gray-600">Emociones más frecuentes en tus registros</p>
+        </div>
+        <div class="p-6">
+            {% if stats.emociones_frecuentes %}
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    {% for emocion, count in stats.emociones_frecuentes.items() %}
+                        <div class="bg-gray-50 rounded-lg p-3 text-center">
+                            <div class="text-lg font-bold text-orange-accent">{{ count }}</div>
+                            <div class="text-xs text-gray-600 capitalize">{{ emocion }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <i class="fas fa-chart-bar text-gray-300 text-3xl mb-4"></i>
+                    <p class="text-gray-600">No hay datos de emociones suficientes para mostrar estadísticas</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Registro por Días de la Semana -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Actividad por Día de la Semana</h2>
+            <p class="text-sm text-gray-600">Frecuencia de registros según el día</p>
+        </div>
+        <div class="p-6">
+            {% set dias_semana = {'Monday': 'Lunes', 'Tuesday': 'Martes', 'Wednesday': 'Miércoles', 'Thursday': 'Jueves', 'Friday': 'Viernes', 'Saturday': 'Sábado', 'Sunday': 'Domingo'} %}
+            {% set registros_por_dia = {} %}
+            
+            {% for registro in registros %}
+                {% set fecha_obj = registro.fecha %}
+                {% if fecha_obj %}
+                    {% set dia_semana = fecha_obj %}
+                    {% if dia_semana %}
+                        {% if registros_por_dia.update({dia_semana: registros_por_dia.get(dia_semana, 0) + 1}) %}{% endif %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            
+            <div class="grid grid-cols-7 gap-2">
+                {% for dia_en, dia_es in dias_semana.items() %}
+                    {% set count = registros_por_dia.get(dia_en, 0) %}
+                    {% set max_count = registros_por_dia.values()|max if registros_por_dia.values() else 1 %}
+                    {% set altura = (count / max_count * 100) if max_count > 0 else 0 %}
+                    
+                    <div class="text-center">
+                        <div class="bg-gray-100 rounded-lg h-24 flex items-end justify-center p-1 mb-2">
+                            <div class="bg-green-primary rounded w-full transition-all duration-300" 
+                                 style="height: {{ altura }}%"></div>
+                        </div>
+                        <div class="text-xs font-medium text-gray-900">{{ count }}</div>
+                        <div class="text-xs text-gray-600">{{ dia_es[:3] }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Insights y Recomendaciones -->
+    <div class="bg-gradient-to-r from-green-primary to-green-secondary rounded-lg p-6 text-white">
+        <h2 class="text-xl font-semibold mb-4">💡 Insights de tu Alimentación Consciente</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="font-medium mb-2">Puntos Fuertes:</h3>
+                <ul class="space-y-1 text-sm text-green-100">
+                    {% if stats.total_registros > 10 %}
+                        <li>✓ Excelente consistencia con {{ stats.total_registros }} registros</li>
+                    {% endif %}
+                    {% if stats.porcentaje_atencion > 70 %}
+                        <li>✓ Alta frecuencia de alimentación consciente ({{ stats.porcentaje_atencion|round|int }}%)</li>
+                    {% endif %}
+                    {% if stats.promedio_hambre > 0 and stats.promedio_hambre >= 4 and stats.promedio_hambre <= 7 %}
+                        <li>✓ Niveles de hambre equilibrados</li>
+                    {% endif %}
+                    {% if not (stats.total_registros > 10 or stats.porcentaje_atencion > 70 or (stats.promedio_hambre > 0 and stats.promedio_hambre >= 4 and stats.promedio_hambre <= 7)) %}
+                        <li>✓ Has comenzado tu viaje hacia la alimentación consciente</li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-medium mb-2">Oportunidades de Mejora:</h3>
+                <ul class="space-y-1 text-sm text-green-100">
+                    {% if stats.porcentaje_atencion < 50 %}
+                        <li>• Incrementar la frecuencia de alimentación consciente</li>
+                    {% endif %}
+                    {% if stats.promedio_hambre > 8 %}
+                        <li>• Considerar comer antes de llegar a niveles muy altos de hambre</li>
+                    {% endif %}
+                    {% if stats.promedio_saciedad > 8 %}
+                        <li>• Practicar parar de comer antes de sentirse muy lleno</li>
+                    {% endif %}
+                    {% if stats.dias_consecutivos < 3 %}
+                        <li>• Trabajar en la consistencia diaria de los registros</li>
+                    {% endif %}
+                    {% if stats.total_registros < 5 %}
+                        <li>• Crear más registros para obtener mejores insights</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Estado vacío -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="p-12 text-center">
+            <i class="fas fa-chart-line text-gray-300 text-4xl mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Sin datos para mostrar</h3>
+            <p class="text-gray-600 mb-6">Necesitas al menos algunos registros para ver estadísticas y tendencias.</p>
+            <a href="{{ url_for('nuevo_registro') }}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-primary hover:bg-green-secondary transition duration-150">
+                <i class="fas fa-plus mr-2"></i>
+                Crear Primer Registro
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if registros and stats.total_registros > 0 %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+try {
+    // Gráfico de Hambre y Saciedad
+    const ctx = document.getElementById('hambreSaciedadChart');
+    if (ctx) {
+        const chartCtx = ctx.getContext('2d');
+        
+        // Usar datos seguros pasados desde el backend
+        const registrosData = {{ registros_json|tojson if registros_json else "[]" }};
+        
+        // Tomar los últimos 10 registros
+        const registrosRecientes = registrosData.slice(-10);
+        
+        if (registrosRecientes.length > 0) {
+            const fechas = registrosRecientes.map(r => {
+                try {
+                    return new Date(r.fecha).toLocaleDateString();
+                } catch (e) {
+                    return 'N/A';
+                }
+            });
+            
+            const hambre = registrosRecientes.map(r => {
+                const nivel = parseFloat(r.nivel_hambre_antes);
+                return isNaN(nivel) ? 0 : nivel;
+            });
+            
+            const saciedad = registrosRecientes.map(r => {
+                const nivel = parseFloat(r.nivel_saciedad_despues);
+                return isNaN(nivel) ? 0 : nivel;
+            });
+
+            new Chart(chartCtx, {
+                type: 'line',
+                data: {
+                    labels: fechas,
+                    datasets: [{
+                        label: 'Nivel de Hambre',
+                        data: hambre,
+                        borderColor: '#D4783F',
+                        backgroundColor: 'rgba(212, 120, 63, 0.1)',
+                        tension: 0.1,
+                        fill: false
+                    }, {
+                        label: 'Nivel de Saciedad',
+                        data: saciedad,
+                        borderColor: '#2D5A41',
+                        backgroundColor: 'rgba(45, 90, 65, 0.1)',
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                            title: {
+                                display: true,
+                                text: 'Nivel (0-10)'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Fecha'
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+        } else {
+            // Si no hay datos, mostrar mensaje
+            const container = ctx.parentElement;
+            container.innerHTML = '<div class="flex items-center justify-center h-32"><p class="text-gray-500">No hay suficientes datos para mostrar el gráfico</p></div>';
+        }
+    }
+} catch (error) {
+    console.error('Error al crear el gráfico:', error);
+    const ctx = document.getElementById('hambreSaciedadChart');
+    if (ctx) {
+        const container = ctx.parentElement;
+        container.innerHTML = '<div class="flex items-center justify-center h-32"><p class="text-red-500">Error al cargar el gráfico</p></div>';
+    }
+}
+</script>
+{% endif %}
+{% endblock %}

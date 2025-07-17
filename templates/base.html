@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Diario de Alimentación Consciente{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'green-primary': '#2D5A41',
+                        'green-secondary': '#4A6741',
+                        'green-light': '#E8F5E8',
+                        'orange-accent': '#D4783F'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    {% if session.user_id %}
+    <nav class="bg-green-primary shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-leaf text-white text-2xl mr-3"></i>
+                        <span class="text-white text-xl font-semibold">Alimentación Consciente</span>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="{{ url_for('dashboard') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-150">
+                        <i class="fas fa-home mr-1"></i> Dashboard
+                    </a>
+                    <a href="{{ url_for('nuevo_registro') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-150">
+                        <i class="fas fa-plus mr-1"></i> Nuevo Registro
+                    </a>
+                    <a href="{{ url_for('mis_registros') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-150">
+                        <i class="fas fa-book mr-1"></i> Mis Registros
+                    </a>
+                    <a href="{{ url_for('reflexion_semanal') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-150">
+                        <i class="fas fa-brain mr-1"></i> Reflexión
+                    </a>
+                    <a href="{{ url_for('estadisticas') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-150">
+                        <i class="fas fa-chart-line mr-1"></i> Estadísticas
+                    </a>
+                    
+                    <div class="relative inline-block text-left">
+                        <button type="button" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium" onclick="toggleDropdown()">
+                            <i class="fas fa-user mr-1"></i> {{ session.user_name }}
+                            <i class="fas fa-chevron-down ml-1"></i>
+                        </button>
+                        <div id="dropdown" class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                            <div class="py-1">
+                                <a href="{{ url_for('generar_reporte_mensual') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-file-pdf mr-2"></i> Reporte Mensual
+                                </a>
+                                <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button class="text-gray-300 hover:text-white" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="{{ url_for('dashboard') }}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                <a href="{{ url_for('nuevo_registro') }}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Nuevo Registro</a>
+                <a href="{{ url_for('mis_registros') }}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Mis Registros</a>
+                <a href="{{ url_for('reflexion_semanal') }}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Reflexión</a>
+                <a href="{{ url_for('estadisticas') }}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Estadísticas</a>
+                <a href="{{ url_for('generar_reporte_mensual') }}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Reporte Mensual</a>
+                <a href="{{ url_for('logout') }}" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Cerrar Sesión</a>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="max-w-7xl mx-auto px-4 py-4">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} mb-4 p-4 rounded-md {% if category == 'error' %}bg-red-100 border-red-400 text-red-700{% elif category == 'success' %}bg-green-100 border-green-400 text-green-700{% else %}bg-blue-100 border-blue-400 text-blue-700{% endif %} border">
+                        <i class="fas fa-{% if category == 'error' %}exclamation-triangle{% elif category == 'success' %}check-circle{% else %}info-circle{% endif %} mr-2"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 px-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-green-primary text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex items-center justify-center mb-4">
+                <i class="fas fa-dumbbell text-2xl mr-3"></i>
+                <span class="text-lg font-semibold">Diario de Alimentación Consciente</span>
+            </div>
+            <p class="text-gray-300 mb-2">Por Mtra. Andrea Tagle Díaz - Nutrióloga Deportiva</p>
+            <p class="text-sm text-gray-400">Conecta contigo y con tu alimentación de manera consciente</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleDropdown() {
+            document.getElementById('dropdown').classList.toggle('hidden');
+        }
+        
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+        
+        // Cerrar dropdown al hacer click fuera
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-toggle')) {
+                var dropdown = document.getElementById('dropdown');
+                if (dropdown && !dropdown.classList.contains('hidden')) {
+                    dropdown.classList.add('hidden');
+                }
+            }
+        }
+        
+        // Auto-hide flash messages
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s ease-out';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.remove();
+                }, 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

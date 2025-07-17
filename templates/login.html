@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <div class="mx-auto h-20 w-20 flex items-center justify-center rounded-full bg-green-light">
+                <i class="fas fa-leaf text-green-primary text-3xl"></i>
+            </div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Diario de Alimentación Consciente
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Conecta contigo y con tu alimentación
+            </p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex bg-gray-100 rounded-lg">
+            <button onclick="showLogin()" id="login-tab" class="flex-1 py-2 px-4 text-center rounded-lg transition duration-150 bg-white text-green-primary font-medium shadow-sm">
+                Iniciar Sesión
+            </button>
+            <button onclick="showRegister()" id="register-tab" class="flex-1 py-2 px-4 text-center rounded-lg transition duration-150 text-gray-600 hover:text-green-primary">
+                Registrarse
+            </button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form" class="space-y-6">
+            <form class="space-y-6" method="POST" action="{{ url_for('login') }}">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <div class="mt-1 relative">
+                        <input id="email" name="email" type="email" required 
+                               class="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-primary focus:border-green-primary focus:z-10 sm:text-sm"
+                               placeholder="tu@email.com">
+                        <i class="fas fa-envelope absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                    <div class="mt-1 relative">
+                        <input id="password" name="password" type="password" required 
+                               class="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-primary focus:border-green-primary focus:z-10 sm:text-sm"
+                               placeholder="••••••••">
+                        <i class="fas fa-lock absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" 
+                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-green-primary hover:bg-green-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-primary transition duration-150">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Iniciar Sesión
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" class="space-y-6 hidden">
+            <form class="space-y-6" method="POST" action="{{ url_for('register') }}">
+                <div>
+                    <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre Completo</label>
+                    <div class="mt-1 relative">
+                        <input id="nombre" name="nombre" type="text" required 
+                               class="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-primary focus:border-green-primary focus:z-10 sm:text-sm"
+                               placeholder="Tu nombre completo">
+                        <i class="fas fa-user absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="reg-email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <div class="mt-1 relative">
+                        <input id="reg-email" name="email" type="email" required 
+                               class="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-primary focus:border-green-primary focus:z-10 sm:text-sm"
+                               placeholder="tu@email.com">
+                        <i class="fas fa-envelope absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" 
+                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-green-primary hover:bg-green-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-primary transition duration-150">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Crear Cuenta
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="mt-8 grid grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div class="text-center">
+                    <i class="fas fa-mindfulness text-2xl text-green-primary mb-2"></i>
+                    <h3 class="text-sm font-medium text-gray-900">Atención Plena</h3>
+                    <p class="text-xs text-gray-600 mt-1">Come con consciencia</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div class="text-center">
+                    <i class="fas fa-heart text-2xl text-orange-accent mb-2"></i>
+                    <h3 class="text-sm font-medium text-gray-900">Escucha tu Cuerpo</h3>
+                    <p class="text-xs text-gray-600 mt-1">Señales de hambre y saciedad</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <p class="text-xs text-gray-500">
+                Por Mtra. Andrea Tagle Díaz - Nutrióloga Deportiva
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showLogin() {
+        document.getElementById('login-form').classList.remove('hidden');
+        document.getElementById('register-form').classList.add('hidden');
+        
+        document.getElementById('login-tab').classList.add('bg-white', 'text-green-primary', 'font-medium', 'shadow-sm');
+        document.getElementById('login-tab').classList.remove('text-gray-600');
+        
+        document.getElementById('register-tab').classList.remove('bg-white', 'text-green-primary', 'font-medium', 'shadow-sm');
+        document.getElementById('register-tab').classList.add('text-gray-600');
+    }
+    
+    function showRegister() {
+        document.getElementById('register-form').classList.remove('hidden');
+        document.getElementById('login-form').classList.add('hidden');
+        
+        document.getElementById('register-tab').classList.add('bg-white', 'text-green-primary', 'font-medium', 'shadow-sm');
+        document.getElementById('register-tab').classList.remove('text-gray-600');
+        
+        document.getElementById('login-tab').classList.remove('bg-white', 'text-green-primary', 'font-medium', 'shadow-sm');
+        document.getElementById('login-tab').classList.add('text-gray-600');
+    }
+</script>
+{% endblock %}

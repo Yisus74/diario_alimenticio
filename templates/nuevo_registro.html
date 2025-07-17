@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Registro Diario</h1>
+                    <p class="text-gray-600 mt-1">Observa con atención lo que comes, cómo lo haces y cómo te sientes</p>
+                </div>
+                <div class="hidden md:block">
+                    <i class="fas fa-journal-whills text-3xl text-green-primary"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-4 bg-green-light">
+            <p class="text-sm text-green-primary font-medium">
+                <i class="fas fa-info-circle mr-2"></i>
+                No se trata de juzgar, sino de reconectar contigo y con tu alimentación. Puedes usarlo cada día para aprender y tomar decisiones más conscientes.
+            </p>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <form method="POST" class="space-y-6">
+        <!-- Información Básica -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                    <i class="fas fa-calendar-day text-green-primary mr-2"></i>
+                    Información Básica
+                </h2>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="fecha" class="block text-sm font-medium text-gray-700 mb-2">Fecha</label>
+                        <input type="date" id="fecha" name="fecha" value="{{ today }}" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-primary focus:border-green-primary">
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="que_comi" class="block text-sm font-medium text-gray-700 mb-2">
+                        ¿Qué comí? <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="que_comi" name="que_comi" rows="3" required
+                              placeholder="Describe los alimentos, bebidas y porciones que consumiste..."
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-primary focus:border-green-primary"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">Incluye alimentos, bebidas y porciones</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="donde_estaba" class="block text-sm font-medium text-gray-700 mb-2">¿Dónde estaba?</label>
+                        <input type="text" id="donde_estaba" name="donde_estaba" 
+                               placeholder="En casa, en el trabajo, en un restaurante..."
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-primary focus:border-green-primary">
+                    </div>
+                    
+                    <div>
+                        <label for="con_quien" class="block text-sm font-medium text-gray-700 mb-2">¿Con quién?</label>
+                        <input type="text" id="con_quien" name="con_quien" 
+                               placeholder="Solo/a, familia, amigos, compañeros..."
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-primary focus:border-green-primary">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Niveles de Hambre y Saciedad -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                    <i class="fas fa-chart-line text-green-primary mr-2"></i>
+                    Niveles de Hambre y Saciedad
+                </h2>
+            </div>
+            <div class="p-6 space-y-6">
+                <div>
+                    <label for="nivel_hambre_antes" class="block text-sm font-medium text-gray-700 mb-2">
+                        Nivel de hambre antes de comer (0-10)
+                    </label>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-500">0 - Nada</span>
+                        <input type="range" id="nivel_hambre_antes" name="nivel_hambre_antes" 
+                               min="0" max="10" value="5" 
+                               class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-green"
+                               oninput="updateHambreValue(this.value)">
+                        <span class="text-sm text-gray-500">10 - Mucha</span>
+                        <span id="hambre-value" class="bg-green-light text-green-primary px-2 py-1 rounded-md text-sm font-medium min-w-[3rem] text-center">5</span>
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="nivel_saciedad_despues" class="block text-sm font-medium text-gray-700 mb-2">
+                        Nivel de saciedad después de comer (0-10)
+                    </label>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-500">0 - Nada</span>
+                        <input type="range" id="nivel_saciedad_despues" name="nivel_saciedad_despues" 
+                               min="0" max="10" value="5" 
+                               class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-green"
+                               oninput="updateSaciedadValue(this.value)">
+                        <span class="text-sm text-gray-500">10 - Muy lleno</span>
+                        <span id="saciedad-value" class="bg-green-light text-green-primary px-2 py-1 rounded-md text-sm font-medium min-w-[3rem] text-center">5</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emociones y Sensaciones -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                    <i class="fas fa-heart text-orange-accent mr-2"></i>
+                    Emociones y Sensaciones
+                </h2>
+            </div>
+            <div class="p-6 space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                        ¿Cómo me sentía antes de comer? (emociones)
+                    </label>
+                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 mb-4">
+                        {% for emocion in emociones %}
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" name="emociones_antes_list" value="{{ emocion.nombre }}" 
+                                   class="sr-only peer"
+                                   onchange="updateEmocionesAntes()">
+                            <span class="px-3 py-1 text-xs rounded-full border border-gray-300 transition-all duration-150 
+                                         peer-checked:bg-orange-100 peer-checked:border-orange-300 peer-checked:text-orange-800
+                                         hover:bg-gray-50">
+                                {{ emocion.nombre }}
+                            </span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" id="emociones_antes" name="emociones_antes">
+                </div>
+                
+                <div>
+                    <label for="sensaciones_fisicas_antes" class="block text-sm font-medium text-gray-700 mb-2">
+                        Sensaciones físicas antes de comer
+                    </label>
+                    <textarea id="sensaciones_fisicas_antes" name="sensaciones_fisicas_antes" rows="2"
+                              placeholder="Cansancio, energía, dolor de cabeza, tensión..."
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-primary focus:border-green-primary"></textarea>
+                </div>
+                
+                <div>
+                    <label for="emociones_despues" class="block text-sm font-medium text-gray-700 mb-2">
+                        ¿Cómo me sentí después de comer?
+                    </label>
+                    <textarea id="emociones_despues" name="emociones_despues" rows="2"
+                              placeholder="Satisfecho, culpable, contento, pesado..."
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-primary focus:border-green-primary"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Atención y Reflexión -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                    <i class="fas fa-brain text-green-primary mr-2"></i>
+                    Atención y Reflexión
+                </h2>
+            </div>
+            <div class="p-6 space-y-6">
+                <div>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" id="comio_con_atencion" name="comio_con_atencion" 
+                               class="h-4 w-4 text-green-primary focus:ring-green-primary border-gray-300 rounded">
+                        <span class="ml-2 text-sm font-medium text-gray-700">¿Comí con atención plena?</span>
+                    </label>
+                    <p class="text-xs text-gray-500 mt-1 ml-6">Sin distracciones como TV, celular o trabajo</p>
+                </div>
+                
+                <div>
+                    <label for="que_noto" class="block text-sm font-medium text-gray-700 mb-2">
+                        ¿Qué noté durante la comida?
+                    </label>
+                    <textarea id="que_noto" name="que_noto" rows="3"
+                              placeholder="Sabores, texturas, velocidad al comer, distracciones..."
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-primary focus:border-green-primary"></textarea>
+                </div>
+                
+                <div>
+                    <label for="que_aprendio" class="block text-sm font-medium text-gray-700 mb-2">
+                        ¿Qué aprendí o noté en esta comida?
+                    </label>
+                    <textarea id="que_aprendio" name="que_aprendio" rows="3"
+                              placeholder="Reflexiones, patrones, cosas que te llamaron la atención..."
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-primary focus:border-green-primary"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex items-center justify-between">
+            <a href="{{ url_for('dashboard') }}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Cancelar
+            </a>
+            
+            <button type="submit" 
+                    class="inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-primary hover:bg-green-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-primary transition duration-150">
+                <i class="fas fa-save mr-2"></i>
+                Guardar Registro
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+.slider-green::-webkit-slider-thumb {
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #2D5A41;
+    cursor: pointer;
+}
+
+.slider-green::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #2D5A41;
+    cursor: pointer;
+    border: none;
+}
+</style>
+
+<script>
+function updateHambreValue(value) {
+    document.getElementById('hambre-value').textContent = value;
+}
+
+function updateSaciedadValue(value) {
+    document.getElementById('saciedad-value').textContent = value;
+}
+
+function updateEmocionesAntes() {
+    const checkboxes = document.querySelectorAll('input[name="emociones_antes_list"]:checked');
+    const selected = Array.from(checkboxes).map(cb => cb.value);
+    document.getElementById('emociones_antes').value = selected.join(', ');
+}
+</script>
+{% endblock %}

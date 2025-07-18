@@ -32,6 +32,29 @@ def init_app():
 # Ejecutar inicialización
 init_app()
 
+# Función segura para obtener atributos de un objeto
+def safe_get_attr(obj, attr, default=None):
+    try:
+            return getattr(obj, attr, default)
+    except Exception:
+        return default
+
+# Si también usas formateo de fechas, puedes agregar:
+from datetime import datetime
+
+def safe_format_date(value, fmt="%d/%m/%Y"):
+    if isinstance(value, datetime):
+        return value.strftime(fmt)
+    try:
+        return datetime.strptime(str(value), "%Y-%m-%d").strftime(fmt)
+    except Exception:
+        return value
+
+# Registrar funciones en el entorno Jinja2
+app.jinja_env.globals.update(
+    safe_get_attr=safe_get_attr,
+    safe_format_date=safe_format_date
+)
 @app.route('/')
 def index():
     if 'user_id' in session:
@@ -99,7 +122,8 @@ def dashboard():
         
         # Obtener registros recientes (últimos 5)
         registros_recientes = DatabaseManager.obtener_registros_por_usuario(user_id)[:5]
-        
+       
+
         # Calcular estadísticas de la semana de manera segura
         consistencia_semanal = 0
         if registros_semana:
@@ -265,9 +289,11 @@ def mis_registros():
                 estadisticas['promedio_saciedad'] = sum(niveles_saciedad) / len(niveles_saciedad)
             
             estadisticas['porcentaje_atencion'] = (registros_con_atencion / len(registros)) * 100
-        
+        datos= []
+        for fila in registros:
+            datos.append(dict(fila))
         return render_template('mis_registros.html', 
-                             registros=registros, 
+                             registros=datos, 
                              estadisticas=estadisticas)
     
     except Exception as e:

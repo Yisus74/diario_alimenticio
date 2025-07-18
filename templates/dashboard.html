@@ -98,11 +98,8 @@
                     </div>
                     <div class="bg-gray-50 p-3 rounded-lg">
                         <p class="text-xs text-gray-600 mb-2">Último registro:</p>
-                        <p class="text-sm font-medium text-gray-900">{{ safe_format_date(safe_get_attr(registros_semana[0], 'fecha')) }}</p>
-                        <p class="text-xs text-gray-600 mt-1 truncate">
-                            {% set que_comi = safe_get_attr(registros_semana[0], 'que_comi', '') %}
-                            {{ que_comi[:50] }}{% if que_comi|length > 50 %}...{% endif %}
-                        </p>
+                        <p class="text-sm font-medium text-gray-900">{{ registros_semana[0].fecha }}</p>
+                        <p class="text-xs text-gray-600 mt-1 truncate">{{ registros_semana[0].que_comi[:50] }}...</p>
                     </div>
                 </div>
             {% else %}
@@ -127,10 +124,10 @@
                 <div>
                     <div class="flex justify-between text-sm mb-1">
                         <span class="text-gray-600">Consistencia Semanal</span>
-                        <span class="font-medium">{{ consistencia_semanal }}%</span>
+                        <span class="font-medium">{{ (registros_semana|length / 7 * 100)|round|int }}%</span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-green-primary h-2 rounded-full" style="width: {{ consistencia_semanal }}%"></div>
+                        <div class="bg-green-primary h-2 rounded-full" style="width: {{ (registros_semana|length / 7 * 100)|round|int }}%"></div>
                     </div>
                 </div>
                 <div class="text-center">
@@ -153,8 +150,7 @@
                     Ver todos
                 </a>
             </div>
-        </div>
-        
+        </div>  
         {% if registros_recientes %}
             <div class="divide-y divide-gray-200">
                 {% for registro in registros_recientes %}
@@ -163,37 +159,31 @@
                         <div class="flex-1">
                             <div class="flex items-center space-x-2 mb-2">
                                 <span class="text-sm font-medium text-gray-900">
-                                    {{ safe_format_date(safe_get_attr(registro, 'fecha')) }}
+                                    {{ registro.fecha }}
                                 </span>
-                                {% if safe_get_attr(registro, 'comio_con_atencion') %}
+                                {% if registro.comio_con_atencion %}
                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-light text-green-primary">
                                         <i class="fas fa-check mr-1"></i>
                                         Con atención
                                     </span>
                                 {% endif %}
                             </div>
-                            <p class="text-gray-700 mb-2">
-                                {% set que_comi = safe_get_attr(registro, 'que_comi', '') %}
-                                {{ que_comi[:100] }}{% if que_comi|length > 100 %}...{% endif %}
-                            </p>
+                            <p class="text-gray-700 mb-2">{{ registro.que_comi[:100] }}{% if registro.que_comi|length > 100 %}...{% endif %}</p>
                             <div class="flex items-center space-x-4 text-sm text-gray-500">
-                                {% set hambre = safe_get_attr(registro, 'nivel_hambre_antes') %}
-                                {% if hambre is not none %}
-                                    <span><i class="fas fa-battery-empty mr-1"></i>Hambre: {{ hambre }}/10</span>
+                                {% if registro.nivel_hambre_antes %}
+                                    <span><i class="fas fa-battery-empty mr-1"></i>Hambre: {{ registro.nivel_hambre_antes }}/10</span>
                                 {% endif %}
-                                {% set saciedad = safe_get_attr(registro, 'nivel_saciedad_despues') %}
-                                {% if saciedad is not none %}
-                                    <span><i class="fas fa-battery-full mr-1"></i>Saciedad: {{ saciedad }}/10</span>
+                                {% if registro.nivel_saciedad_despues %}
+                                    <span><i class="fas fa-battery-full mr-1"></i>Saciedad: {{ registro.nivel_saciedad_despues }}/10</span>
                                 {% endif %}
                             </div>
                         </div>
                         <div class="ml-4">
-                            {% set emociones = safe_get_attr(registro, 'emociones_antes') %}
-                            {% if emociones %}
+                            {% if registro.emociones_antes %}
                                 <div class="text-right">
                                     <p class="text-xs text-gray-500 mb-1">Emoción antes:</p>
                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-800">
-                                        {{ emociones.split(',')[0] if ',' in emociones else emociones }}
+                                        {{ registro.emociones_antes.split(',')[0] if ',' in registro.emociones_antes else registro.emociones_antes }}
                                     </span>
                                 </div>
                             {% endif %}

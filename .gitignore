@@ -18,5 +18,7 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-diario_alimentacion*
+diario_alimentacion_backup*.db
+diario_alimentacion_backup_20250717_132108.db
+
 diario_alimentacion.db
